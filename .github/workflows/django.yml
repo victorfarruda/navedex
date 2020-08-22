@@ -35,6 +35,9 @@ jobs:
     - name: Lint with flake8
       run: |
         pipenv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
+    - name: Test with pytest without migrations
+      run: |
+        pipenv run pytest --nomigrations
     - name: Run migrations
       run: pipenv run python manage.py migrate
     - name: Test with pytest
