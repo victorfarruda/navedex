@@ -10,6 +10,10 @@ pytest-django = "*"
 
 [packages]
 django = "*"
+pytest-cov = "*"
+python-decouple = "*"
+dj-database-url = "*"
+django-debug-toolbar = "*"
 
 [requires]
 python_version = "3.8"
