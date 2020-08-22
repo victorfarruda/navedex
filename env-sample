@@ -1,5 +1,5 @@
 DEBUG=False
 SECRET_KEY=Defina sua chave secreta
 ALLOWED_HOSTS=localhost, 0.0.0.0
-DATABASE_URL=postgres://postgres:postgres@postgres/postgres
+DATABASE_URL=postgres://postgres_user:postgres_password@postgres/postgres_db
 USE_DEBUG_TOOLBAR=True

@@ -8,13 +8,19 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
       matrix:
         python-version: [3.8.2]
     steps:
+    - uses: harmon758/postgresql-action@v1
+      with:
+        postgresql version: '11'
+        postgresql password: postgres_password
+        postgresql user: 'postgres_user'
+        postgresql db: 'postgres_db'
+
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -28,7 +34,7 @@ jobs:
         pipenv sync --dev
     - name: Lint with flake8
       run: |
-        pipenv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        pipenv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
     - name: Run migrations
       run: pipenv run python manage.py migrate
     - name: Test with pytest
