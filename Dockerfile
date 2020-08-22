@@ -9,7 +9,7 @@ COPY Pipfile /app/
 COPY Pipfile.lock /app/
 
 RUN pip install pipenv
-RUN pipenv install --system --deploy --ignore-pipfile
+RUN pipenv install --system --deploy --dev --ignore-pipfile
 
 COPY . /app/
 
