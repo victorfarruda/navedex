@@ -16,3 +16,16 @@ def test_can_create_new_user(client, db):
     user_created = User.objects.first()
     assert user_created.email == email_used
     assert user_created.password != password_used
+
+
+def test_receive_jwt_when_pass_email_and_password(client, db):
+    url = reverse('base:login')
+    email_used = 'my_email@email.com'
+    password_used = 'my_password'
+    User.objects.create_user(email=email_used, password=password_used)
+    data = {
+        'email': email_used,
+        'password': password_used,
+    }
+    response = client.post(url, data=data)
+    assert response.json().get('token')
