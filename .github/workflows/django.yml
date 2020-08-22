@@ -2,9 +2,9 @@ name: Django CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, staging ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, staging ]
 
 jobs:
   build:
@@ -39,4 +39,4 @@ jobs:
       run: pipenv run python manage.py migrate
     - name: Test with pytest
       run: |
-        pipenv run pytest --cov=navedex
+        pipenv run pytest
