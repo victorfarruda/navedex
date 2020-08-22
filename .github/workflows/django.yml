@@ -24,6 +24,7 @@ jobs:
       run: |
         python --version
         pip install pipenv
+        cp env-sample .env
         pipenv sync --dev
     - name: Lint with flake8
       run: |
