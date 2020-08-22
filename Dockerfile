@@ -1,7 +1,6 @@
 FROM python:3.8
 LABEL maintainer 'Victor'
 ENV PYTHONUNBUFFERED 1
-ENV PIPENV_VENV_IN_PROJECT True
 
 RUN mkdir /app
 WORKDIR /app
