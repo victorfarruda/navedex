@@ -82,7 +82,7 @@ def test_can_create_new_naver(django_user_model, client, db):
         'projects': [project.id, ],
     }
     client.login(email='foo@bar.com', password='password')
-    response = client.post(url, data=data)
+    response = client.post(url, data=data, content_type='application/json')
     assert response.status_code == status.HTTP_201_CREATED
     naver_response = response.json()
 

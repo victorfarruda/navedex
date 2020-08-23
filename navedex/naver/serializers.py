@@ -33,7 +33,7 @@ class NaverSerializerGet(ModelSerializer):
     class Meta:
         model = Naver
         fields = ('id', 'name', 'birthdate', 'admission_date', 'job_role', 'projects',)
-        depth = 2
+        depth = 1
 
 
 class ProjectSerializerPostOrPut(ModelSerializer):
@@ -52,4 +52,4 @@ class ProjectSerializerGet(ModelSerializer):
     class Meta:
         model = Project
         fields = ('id', 'name', 'navers')
-        depth = 2
+        depth = 1

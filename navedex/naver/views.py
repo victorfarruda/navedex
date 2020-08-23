@@ -24,9 +24,7 @@ class NaverModelViewSet(ModelViewSet):
         return self.serializer_class(*args, **kwargs)
 
     def create(self, *args, **kwargs):
-        self.request.data._mutable = True
-        self.request.data.appendlist('responsible', self.request.user.id)
-        self.request.data._mutable = False
+        self.request.data['responsible'] = self.request.user.id
         return super().create(self.request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
@@ -52,9 +50,7 @@ class ProjectModelViewSet(ModelViewSet):
         return self.serializer_class(*args, **kwargs)
 
     def create(self, *args, **kwargs):
-        self.request.data._mutable = True
-        self.request.data.appendlist('responsible', self.request.user.id)
-        self.request.data._mutable = False
+        self.request.data['responsible'] = self.request.user.id
         return super().create(self.request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):

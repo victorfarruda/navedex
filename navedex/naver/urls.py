@@ -9,5 +9,5 @@ router.register('project', views.ProjectModelViewSet)
 
 app_name = 'naver'
 urlpatterns = [
-    path(r'', include(router.urls)),
+    path(r'api/', include(router.urls)),
 ]
