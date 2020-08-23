@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 
-from navedex.naver.models import Naver
+from navedex.naver.models import Naver, Project
 
 
 class NaverSerializer(ModelSerializer):
@@ -23,3 +23,10 @@ class NaverSerializerGet(ModelSerializer):
         model = Naver
         fields = ('id', 'name', 'birthdate', 'admission_date', 'job_role')
         depth = 2
+
+
+class ProjectSerializer(ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ('id', 'name',)
+        depth = 0

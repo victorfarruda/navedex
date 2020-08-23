@@ -2,8 +2,8 @@ import django_filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
-from navedex.naver.models import Naver
-from navedex.naver.serializers import NaverSerializer, NaverSerializerGet, NaverSerializerPostOrPut
+from navedex.naver.models import Naver, Project
+from navedex.naver.serializers import NaverSerializer, NaverSerializerGet, NaverSerializerPostOrPut, ProjectSerializer
 
 
 class NaverModelViewSet(ModelViewSet):
@@ -32,3 +32,14 @@ class NaverModelViewSet(ModelViewSet):
     def update(self, request, *args, **kwargs):
         self.request.data['responsible'] = self.request.user.id
         return super().update(self.request, *args, **kwargs)
+
+
+class ProjectModelViewSet(ModelViewSet):
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    queryset = Project.objects.all()
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_fields = ['name']
+
+    def get_queryset(self):
+        return self.queryset.filter(responsible=self.request.user)
