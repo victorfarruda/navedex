@@ -14,4 +14,3 @@ class Project(models.Model):
     name = models.CharField(max_length=120, null=False, blank=False)
     responsible = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
     navers = models.ManyToManyField(Naver, related_name='projects')
-
