@@ -95,3 +95,22 @@ def test_can_update_a_project(django_user_model, client, db):
     assert data.get('name') == project_response.get('name')
     assert data.get('navers') == project_response.get('navers')
     assert Project.objects.count() == 1
+
+
+def test_can_delete_a_project(django_user_model, client, db):
+    user = django_user_model.objects.create_user(email='foo@bar.com', password='password')
+    other_user = django_user_model.objects.create_user(email='bar@foo.com', password='password')
+    project = mommy.make(Project, responsible=user)
+    url = reverse('naver:project-detail', args=(project.id,))
+
+    response = client.delete(url, content_type='application/json')
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    client.login(email='bar@foo.com', password='password')
+    response = client.delete(url, content_type='application/json')
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    client.login(email='foo@bar.com', password='password')
+    response = client.delete(url, content_type='application/json')
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+    assert Project.objects.count() == 0
