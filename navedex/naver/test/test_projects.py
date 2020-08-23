@@ -23,12 +23,12 @@ def is_projects_valid(user, client):
     url = reverse('naver:project-list')
     response = client.get(url)
     assert response.status_code == status.HTTP_200_OK
-    navers = response.json()
-    for naver in navers:
-        assert naver.get('id')
-        assert naver.get('name')
-        assert len(naver.values()) == 2
-    assert len(navers) == Project.objects.filter(responsible=user).count()
+    projects = response.json()
+    for project in projects:
+        assert project.get('id')
+        assert project.get('name')
+        assert len(project.values()) == 2
+    assert len(projects) == Project.objects.filter(responsible=user).count()
 
 
 def test_can_list_projects_and_filter_by_name(client, django_user_model, db):
@@ -62,8 +62,10 @@ def test_can_create_new_project(django_user_model, client, db):
     assert response.status_code == status.HTTP_201_CREATED
     project_response = response.json()
 
+    assert project_response.get('id')
     assert data.get('name') == project_response.get('name')
-    assert naver.id in project_response.get('navers')
+    assert data.get('navers') == project_response.get('navers')
+    assert len(project_response.values()) == 3
     assert Project.objects.count() == 1
 
 
@@ -92,10 +94,10 @@ def test_can_update_a_project(django_user_model, client, db):
     assert response.status_code == status.HTTP_200_OK
     project_response = response.json()
 
-    assert data.get('id') == project.id
+    assert project.id == project_response.get('id')
     assert data.get('name') == project_response.get('name')
     assert data.get('navers') == project_response.get('navers')
-    assert len(data.values()) == 3
+    assert len(project_response.values()) == 3
     assert Project.objects.count() == 1
 
 
