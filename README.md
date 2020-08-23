@@ -14,23 +14,30 @@ cp env-sample .env
 2. [Instalar o docker-compose](https://docs.docker.com/compose/install/)
 
 ### Para utilizar o Docker com o Docker Compose:
+Primeiro gere a imagem do projeto:
 ```
 docker-compose build
-
-Atualize o banco de dados do .env com
+```
+Atualize o banco de dados do .env para:
+```
 DATABASE_URL=postgres://postgres:postgres@db/postgres
-
+```
 Coloque o banco de dados postgres no ar com:
+```
 docker-compose up -d db
-
-Não Esqueça das migrations
+```
+Não Esqueça das migrations:
+```
 docker-compose run --rm web python manage.py migrate
-
-E pode iniciar o projeto
+```
+E pode iniciar o projeto:
+```
 docker-compose up -d
 ```
-E o projeto está rodando em localhost:8000
-
+E o projeto está rodando em:
+```
+http://localhost:8000
+```
 ### Testes
 
 Para rodar os testes pode usar o comando:
