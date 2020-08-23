@@ -1,6 +1,7 @@
 from django.http import QueryDict
 from django.urls import reverse
 from model_mommy import mommy
+from rest_framework import status
 
 from navedex.naver.models import Naver
 
@@ -121,3 +122,21 @@ def test_can_update_a_naver(django_user_model, client, db):
     assert data.get('job_role') == naver_response.get('job_role')
     assert Naver.objects.count() == 1
 
+
+def test_can_delete_a_naver(django_user_model, client, db):
+    user = django_user_model.objects.create_user(email='foo@bar.com', password='password')
+    other_user = django_user_model.objects.create_user(email='bar@foo.com', password='password')
+    naver = mommy.make(Naver, responsible=user)
+    url = reverse('naver:naver-detail', args=(naver.id,))
+
+    response = client.delete(url, content_type='application/json')
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    client.login(email='bar@foo.com', password='password')
+    response = client.delete(url, content_type='application/json')
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    client.login(email='foo@bar.com', password='password')
+    response = client.delete(url, content_type='application/json')
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+    assert Naver.objects.count() == 0
