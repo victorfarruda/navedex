@@ -4,7 +4,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from navedex.naver.models import Naver, Project
 from navedex.naver.serializers import NaverSerializer, NaverSerializerGet, NaverSerializerPostOrPut, ProjectSerializer, \
-    ProjectSerializerPostOrPut
+    ProjectSerializerPostOrPut, ProjectSerializerGet
 
 
 class NaverModelViewSet(ModelViewSet):
@@ -48,6 +48,8 @@ class ProjectModelViewSet(ModelViewSet):
     def get_serializer(self, *args, **kwargs):
         if self.request.method == 'POST' or self.request.method == 'PUT':
             return ProjectSerializerPostOrPut(*args, **kwargs)
+        elif self.request.method == 'GET' and not kwargs.get('many'):
+            return ProjectSerializerGet(*args, **kwargs)
         return self.serializer_class(*args, **kwargs)
 
     def create(self, *args, **kwargs):

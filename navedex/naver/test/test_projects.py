@@ -92,8 +92,10 @@ def test_can_update_a_project(django_user_model, client, db):
     assert response.status_code == status.HTTP_200_OK
     project_response = response.json()
 
+    assert data.get('id') == project.id
     assert data.get('name') == project_response.get('name')
     assert data.get('navers') == project_response.get('navers')
+    assert len(data.values()) == 3
     assert Project.objects.count() == 1
 
 
@@ -114,3 +116,35 @@ def test_can_delete_a_project(django_user_model, client, db):
     response = client.delete(url, content_type='application/json')
     assert response.status_code == status.HTTP_204_NO_CONTENT
     assert Project.objects.count() == 0
+
+
+def test_can_retrieve_a_project(django_user_model, client, db):
+    user = django_user_model.objects.create_user(email='foo@bar.com', password='password')
+    other_user = django_user_model.objects.create_user(email='bar@foo.com', password='password')
+    navers = mommy.make(Naver, responsible=user, _quantity=2)
+    project = mommy.make(Project, navers=navers, responsible=user)
+    url = reverse('naver:project-detail', args=(project.id,))
+
+    response = client.get(url, content_type='application/json')
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    client.login(email='bar@foo.com', password='password')
+    response = client.get(url, content_type='application/json')
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    client.login(email='foo@bar.com', password='password')
+    response = client.get(url, content_type='application/json')
+    assert response.status_code == status.HTTP_200_OK
+    assert Project.objects.count() == 1
+    assert Naver.objects.count() == 2
+
+    project_response = response.json()
+    assert project.name == project_response.get('name')
+    assert project.navers.count() == len(project_response.get('navers'))
+    for naver in project_response.get('navers'):
+        assert naver.get('id')
+        assert naver.get('name')
+        assert naver.get('birthdate')
+        assert naver.get('admission_date')
+        assert naver.get('job_role')
+        assert len(naver.values()) == 5

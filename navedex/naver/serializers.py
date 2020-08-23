@@ -40,3 +40,12 @@ class ProjectSerializerPostOrPut(ModelSerializer):
         fields = ('id', 'name', 'navers', 'responsible',)
         extra_kwargs = {'responsible': {'write_only': True}}
         depth = 0
+
+
+class ProjectSerializerGet(ModelSerializer):
+    navers = NaverSerializer(many=True)
+
+    class Meta:
+        model = Project
+        fields = ('id', 'name', 'navers')
+        depth = 2
