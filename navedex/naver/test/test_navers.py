@@ -22,7 +22,7 @@ def test_can_list_navers_by_user(django_user_model, client, db):
 def is_navers_valid(user, client):
     url = reverse('naver:naver-list')
     response = client.get(url)
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     navers = response.json()
     for naver in navers:
         assert naver.get('id')
@@ -45,7 +45,7 @@ def test_can_list_navers_and_filter_by_name(client, django_user_model, db):
 
     client.login(email='foo@bar.com', password='password')
     response = client.get(url)
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     navers = response.json()
     for naver in navers:
         assert naver.get('name') == search_name
@@ -63,7 +63,7 @@ def test_can_list_navers_and_filter_by_job_role(client, django_user_model, db):
 
     client.login(email='foo@bar.com', password='password')
     response = client.get(url)
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     navers = response.json()
     for naver in navers:
         assert naver.get('job_role') == search_job_role
@@ -82,7 +82,7 @@ def test_can_create_new_naver(django_user_model, client, db):
     }
     client.login(email='foo@bar.com', password='password')
     response = client.post(url, data=data)
-    assert response.status_code == 201
+    assert response.status_code == status.HTTP_201_CREATED
     naver_response = response.json()
 
     assert data.get('name') == naver_response.get('name')
@@ -105,15 +105,15 @@ def test_can_update_a_naver(django_user_model, client, db):
         'projects': [],
     }
     response = client.put(url, data=data, content_type='application/json')
-    assert response.status_code == 401
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     client.login(email='bar@foo.com', password='password')
     response = client.put(url, data=data, content_type='application/json')
-    assert response.status_code == 404
+    assert response.status_code == status.HTTP_404_NOT_FOUND
 
     client.login(email='foo@bar.com', password='password')
     response = client.put(url, data=data, content_type='application/json')
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     naver_response = response.json()
 
     assert data.get('name') == naver_response.get('name')
