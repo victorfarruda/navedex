@@ -15,6 +15,10 @@ python-decouple = "*"
 dj-database-url = "*"
 django-debug-toolbar = "*"
 psycopg2-binary = "*"
+djangorestframework-jwt = "*"
+djangorestframework = "*"
+django-filter = "*"
+model-mommy = "*"
 
 [requires]
 python_version = "3.8"
