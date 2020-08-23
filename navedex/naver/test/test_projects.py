@@ -3,7 +3,7 @@ from django.urls import reverse
 from model_mommy import mommy
 from rest_framework import status
 
-from navedex.naver.models import Project
+from navedex.naver.models import Project, Naver
 
 
 def test_can_list_projects_by_user(django_user_model, client, db):
@@ -47,3 +47,51 @@ def test_can_list_projects_and_filter_by_name(client, django_user_model, db):
     for project in projects:
         assert project.get('name') == search_name
     assert len(projects) == 3
+
+
+def test_can_create_new_project(django_user_model, client, db):
+    url = reverse('naver:project-list')
+    user = django_user_model.objects.create_user(email='foo@bar.com', password='password')
+    naver = mommy.make(Naver, responsible=user)
+    data = {
+        'name': 'Projeto Bom',
+        'navers': [naver.id, ]
+    }
+    client.login(email='foo@bar.com', password='password')
+    response = client.post(url, data=data)
+    assert response.status_code == status.HTTP_201_CREATED
+    project_response = response.json()
+
+    assert data.get('name') == project_response.get('name')
+    assert naver.id in project_response.get('navers')
+    assert Project.objects.count() == 1
+
+
+def test_can_update_a_project(django_user_model, client, db):
+    user = django_user_model.objects.create_user(email='foo@bar.com', password='password')
+    other_user = django_user_model.objects.create_user(email='bar@foo.com', password='password')
+
+    naver = mommy.make(Naver, responsible=user, _quantity=2)
+    project = mommy.make(Project, navers=naver, responsible=user)
+    other_naver = mommy.make(Naver, responsible=user)
+    data = {
+        'name': 'Projeto Bom',
+        'navers': [other_naver.id, ]
+    }
+
+    url = reverse('naver:project-detail', args=(project.id,))
+    response = client.put(url, data=data, content_type='application/json')
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    client.login(email='bar@foo.com', password='password')
+    response = client.put(url, data=data, content_type='application/json')
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    client.login(email='foo@bar.com', password='password')
+    response = client.put(url, data=data, content_type='application/json')
+    assert response.status_code == status.HTTP_200_OK
+    project_response = response.json()
+
+    assert data.get('name') == project_response.get('name')
+    assert data.get('navers') == project_response.get('navers')
+    assert Project.objects.count() == 1
