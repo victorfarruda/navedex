@@ -71,7 +71,7 @@ def test_can_create_new_project(django_user_model, client, db):
 
 def test_can_update_a_project(django_user_model, client, db):
     user = django_user_model.objects.create_user(email='foo@bar.com', password='password')
-    other_user = django_user_model.objects.create_user(email='bar@foo.com', password='password')
+    django_user_model.objects.create_user(email='bar@foo.com', password='password')
 
     naver = mommy.make(Naver, responsible=user, _quantity=2)
     project = mommy.make(Project, navers=naver, responsible=user)
@@ -103,7 +103,7 @@ def test_can_update_a_project(django_user_model, client, db):
 
 def test_can_delete_a_project(django_user_model, client, db):
     user = django_user_model.objects.create_user(email='foo@bar.com', password='password')
-    other_user = django_user_model.objects.create_user(email='bar@foo.com', password='password')
+    django_user_model.objects.create_user(email='bar@foo.com', password='password')
     project = mommy.make(Project, responsible=user)
     url = reverse('naver:project-detail', args=(project.id,))
 
@@ -122,7 +122,7 @@ def test_can_delete_a_project(django_user_model, client, db):
 
 def test_can_retrieve_a_project(django_user_model, client, db):
     user = django_user_model.objects.create_user(email='foo@bar.com', password='password')
-    other_user = django_user_model.objects.create_user(email='bar@foo.com', password='password')
+    django_user_model.objects.create_user(email='bar@foo.com', password='password')
     navers = mommy.make(Naver, responsible=user, _quantity=2)
     project = mommy.make(Project, navers=navers, responsible=user)
     url = reverse('naver:project-detail', args=(project.id,))

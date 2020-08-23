@@ -3,7 +3,7 @@ from django.urls import reverse
 from model_mommy import mommy
 from rest_framework import status
 
-from navedex.naver.models import Naver
+from navedex.naver.models import Naver, Project
 
 
 def test_can_list_navers_by_user(django_user_model, client, db):
@@ -73,37 +73,44 @@ def test_can_list_navers_and_filter_by_job_role(client, django_user_model, db):
 def test_can_create_new_naver(django_user_model, client, db):
     url = reverse('naver:naver-list')
     user = django_user_model.objects.create_user(email='foo@bar.com', password='password')
+    project = mommy.make(Project, responsible=user)
     data = {
         'name': 'Fulano',
         'birthdate': '1999-05-15',
         'admission_date': '2020-06-12',
         'job_role': 'Desenvolvedor',
-        'projects': [],
+        'projects': [project.id, ],
     }
     client.login(email='foo@bar.com', password='password')
     response = client.post(url, data=data)
     assert response.status_code == status.HTTP_201_CREATED
     naver_response = response.json()
 
+    assert naver_response.get('id')
     assert data.get('name') == naver_response.get('name')
     assert data.get('birthdate') == naver_response.get('birthdate')
     assert data.get('admission_date') == naver_response.get('admission_date')
     assert data.get('job_role') == naver_response.get('job_role')
+    assert data.get('projects') == naver_response.get('projects')
+    assert len(naver_response.values()) == 6
     assert Naver.objects.count() == 1
 
 
 def test_can_update_a_naver(django_user_model, client, db):
     user = django_user_model.objects.create_user(email='foo@bar.com', password='password')
-    other_user = django_user_model.objects.create_user(email='bar@foo.com', password='password')
-    naver = mommy.make(Naver, responsible=user)
+    django_user_model.objects.create_user(email='bar@foo.com', password='password')
+    projects = mommy.make(Project, responsible=user, _quantity=3)
+    naver = mommy.make(Naver, projects=projects, responsible=user)
     url = reverse('naver:naver-detail', args=(naver.id,))
+    other_project = mommy.make(Project, responsible=user)
     data = {
         'name': 'Fulano',
         'birthdate': '1999-05-15',
         'admission_date': '2020-06-12',
         'job_role': 'Desenvolvedor',
-        'projects': [],
+        'projects': [other_project.id, ],
     }
+    assert naver.projects.count() == 3
     response = client.put(url, data=data, content_type='application/json')
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -116,16 +123,19 @@ def test_can_update_a_naver(django_user_model, client, db):
     assert response.status_code == status.HTTP_200_OK
     naver_response = response.json()
 
+    assert naver_response.get('id')
     assert data.get('name') == naver_response.get('name')
     assert data.get('birthdate') == naver_response.get('birthdate')
     assert data.get('admission_date') == naver_response.get('admission_date')
     assert data.get('job_role') == naver_response.get('job_role')
+    assert data.get('projects') == naver_response.get('projects')
+    assert len(naver_response.values()) == 6
     assert Naver.objects.count() == 1
 
 
 def test_can_delete_a_naver(django_user_model, client, db):
     user = django_user_model.objects.create_user(email='foo@bar.com', password='password')
-    other_user = django_user_model.objects.create_user(email='bar@foo.com', password='password')
+    django_user_model.objects.create_user(email='bar@foo.com', password='password')
     naver = mommy.make(Naver, responsible=user)
     url = reverse('naver:naver-detail', args=(naver.id,))
 
@@ -144,7 +154,7 @@ def test_can_delete_a_naver(django_user_model, client, db):
 
 def test_can_retrieve_a_naver(django_user_model, client, db):
     user = django_user_model.objects.create_user(email='foo@bar.com', password='password')
-    other_user = django_user_model.objects.create_user(email='bar@foo.com', password='password')
+    django_user_model.objects.create_user(email='bar@foo.com', password='password')
     naver = mommy.make(Naver, responsible=user)
     url = reverse('naver:naver-detail', args=(naver.id,))
 
@@ -165,3 +175,7 @@ def test_can_retrieve_a_naver(django_user_model, client, db):
     assert str(naver.birthdate) == naver_response.get('birthdate')
     assert str(naver.admission_date) == naver_response.get('admission_date')
     assert naver.job_role == naver_response.get('job_role')
+    for project in naver_response.get('projects'):
+        assert project.get('id')
+        assert project.get('name')
+        assert len(project.values()) == 2

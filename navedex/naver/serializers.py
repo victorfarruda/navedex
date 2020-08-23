@@ -11,18 +11,13 @@ class NaverSerializer(ModelSerializer):
 
 
 class NaverSerializerPostOrPut(ModelSerializer):
+    projects = PrimaryKeyRelatedField(many=True, read_only=False, queryset=Project.objects.all())
+
     class Meta:
         model = Naver
-        fields = ('id', 'name', 'birthdate', 'admission_date', 'job_role', 'responsible')
+        fields = ('id', 'name', 'birthdate', 'admission_date', 'job_role', 'responsible', 'projects',)
         extra_kwargs = {'responsible': {'write_only': True}}
         depth = 0
-
-
-class NaverSerializerGet(ModelSerializer):
-    class Meta:
-        model = Naver
-        fields = ('id', 'name', 'birthdate', 'admission_date', 'job_role')
-        depth = 2
 
 
 class ProjectSerializer(ModelSerializer):
@@ -30,6 +25,15 @@ class ProjectSerializer(ModelSerializer):
         model = Project
         fields = ('id', 'name',)
         depth = 0
+
+
+class NaverSerializerGet(ModelSerializer):
+    projects = ProjectSerializer(many=True)
+
+    class Meta:
+        model = Naver
+        fields = ('id', 'name', 'birthdate', 'admission_date', 'job_role', 'projects',)
+        depth = 2
 
 
 class ProjectSerializerPostOrPut(ModelSerializer):
