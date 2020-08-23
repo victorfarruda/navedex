@@ -38,5 +38,8 @@ Para rodar os testes pode usar o comando:
 docker-compose run --rm web pytest --cov=navedex
 ```
 
+Você também pode executar testes no Postman
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/0c34756467d47b944066)
+
 ### Possíveis dificuldades com a utilização pode entrar em contato:
 victorf.arruda@outlook.com
