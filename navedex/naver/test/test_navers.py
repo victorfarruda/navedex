@@ -140,3 +140,28 @@ def test_can_delete_a_naver(django_user_model, client, db):
     response = client.delete(url, content_type='application/json')
     assert response.status_code == status.HTTP_204_NO_CONTENT
     assert Naver.objects.count() == 0
+
+
+def test_can_retrieve_a_naver(django_user_model, client, db):
+    user = django_user_model.objects.create_user(email='foo@bar.com', password='password')
+    other_user = django_user_model.objects.create_user(email='bar@foo.com', password='password')
+    naver = mommy.make(Naver, responsible=user)
+    url = reverse('naver:naver-detail', args=(naver.id,))
+
+    response = client.get(url, content_type='application/json')
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    client.login(email='bar@foo.com', password='password')
+    response = client.get(url, content_type='application/json')
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    client.login(email='foo@bar.com', password='password')
+    response = client.get(url, content_type='application/json')
+    assert response.status_code == status.HTTP_200_OK
+    assert Naver.objects.count() == 1
+
+    naver_response = response.json()
+    assert naver.name == naver_response.get('name')
+    assert str(naver.birthdate) == naver_response.get('birthdate')
+    assert str(naver.admission_date) == naver_response.get('admission_date')
+    assert naver.job_role == naver_response.get('job_role')

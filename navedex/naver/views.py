@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from navedex.naver.models import Naver
-from navedex.naver.serializers import NaverSerializer, NaverSerializerGET
+from navedex.naver.serializers import NaverSerializer, NaverSerializerGet, NaverSerializerPostOrPut
 
 
 class NaverModelViewSet(ModelViewSet):
@@ -17,8 +17,10 @@ class NaverModelViewSet(ModelViewSet):
         return self.queryset.filter(responsible=self.request.user)
 
     def get_serializer(self, *args, **kwargs):
-        if self.request.method == 'GET' and self.get_object() is not None:
-            return NaverSerializerGET(*args, **kwargs)
+        if self.request.method == 'POST' or self.request.method == 'PUT':
+            return NaverSerializerPostOrPut(*args, **kwargs)
+        elif self.request.method == 'GET' and not kwargs.get('many'):
+            return NaverSerializerGet(*args, **kwargs)
         return self.serializer_class(*args, **kwargs)
 
     def create(self, *args, **kwargs):
