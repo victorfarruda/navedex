@@ -67,3 +67,18 @@ def test_can_list_navers_and_filter_by_job_role(client, django_user_model, db):
     for naver in navers:
         assert naver.get('job_role') == search_job_role
     assert len(navers) == 3
+
+
+def test_can_create_new_naver(django_user_model, client, db):
+    url = reverse('naver:naver-list')
+    user = django_user_model.objects.create_user(email='foo@bar.com', password='password')
+    data = {
+        'name': 'Fulano',
+        'birthdate': '1999-05-15',
+        'admission_date': '2020-06-12',
+        'job_role': 'Desenvolvedor',
+        'projects': [],
+    }
+    client.login(email='foo@bar.com', password='password')
+    client.post(url, data=data)
+    assert Naver.objects.count() == 1
