@@ -41,7 +41,9 @@ class ProjectModelViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated,)
     queryset = Project.objects.all()
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
-    filterset_fields = ['name']
+    filterset_fields = {
+        'name': ['exact', 'contains'],
+    }
 
     def get_queryset(self):
         return self.queryset.filter(responsible=self.request.user)
