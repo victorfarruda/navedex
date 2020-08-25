@@ -2,8 +2,8 @@ import django_filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
-from navedex.naver.models import Naver, Project
 from navedex.naver import serializers
+from navedex.naver.models import Naver, Project
 
 
 class NaverModelViewSet(ModelViewSet):
@@ -11,7 +11,11 @@ class NaverModelViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated,)
     queryset = Naver.objects.all()
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
-    filterset_fields = ['name', 'job_role']
+    filterset_fields = {
+        'name': ['exact', 'contains'],
+        'job_role': ['exact', 'contains'],
+        'admission_date': ['exact', 'gte', 'lte'],
+    }
 
     def get_queryset(self):
         return self.queryset.filter(responsible=self.request.user)

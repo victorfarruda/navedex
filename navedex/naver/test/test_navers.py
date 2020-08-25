@@ -1,6 +1,8 @@
+from datetime import timedelta, date, datetime
+
 from django.http import QueryDict
 from django.urls import reverse
-from model_mommy import mommy
+from model_mommy import mommy, seq
 from rest_framework import status
 
 from navedex.naver.models import Naver, Project
@@ -68,6 +70,29 @@ def test_can_list_navers_and_filter_by_job_role(client, django_user_model, db):
     for naver in navers:
         assert naver.get('job_role') == search_job_role
     assert len(navers) == 3
+
+
+def test_can_list_navers_and_filter_by_admission_date(client, django_user_model, db):
+    search_job_role = '2020-08-29'
+    user = django_user_model.objects.create_user(email='foo@bar.com', password='password')
+    mommy.make(
+        Naver,
+        admission_date=seq(date(2020, 8, 24), timedelta(days=1)),
+        responsible=user,
+        _quantity=10
+    )
+    query_dict = QueryDict('', mutable=True)
+    query_dict['admission_date__gte'] = search_job_role
+    url = '%s?%s' % (reverse('naver:naver-list'), query_dict.urlencode())
+
+    client.login(email='foo@bar.com', password='password')
+    response = client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+    navers = response.json()
+    for naver in navers:
+        assert datetime.strptime(naver.get('admission_date'), '%Y-%m-%d') \
+               >= datetime.strptime(search_job_role, '%Y-%m-%d')
+    assert len(navers) == 6
 
 
 def test_can_create_new_naver(django_user_model, client, db):
